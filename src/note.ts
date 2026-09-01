@@ -1,4 +1,4 @@
-import { stripMfm } from '@makeitaquote/utils/mfm'
+import { resolveNoteText, stripMfm } from '@makeitaquote/utils/mfm'
 import { ValidationError } from './errors'
 import { emptyQuote } from './quote'
 import type { NoteLike, NoteSourceOptions, QuoteData } from './types'
@@ -42,7 +42,7 @@ export function fromNote(note: unknown, options: NoteSourceOptions = {}): QuoteD
     )
   }
 
-  const source = options.preferCw ? (note.cw ?? note.text ?? '') : (note.text ?? note.cw ?? '')
+  const source = resolveNoteText(note, options.preferCw)
 
   const quote = emptyQuote()
   quote.text = options.stripMfm === false ? source : stripMfm(source)

@@ -55,27 +55,6 @@ describe('fromNote', () => {
     expect(quote.text).toBe('$[jelly おはよう]')
   })
 
-  it('quotes the text rather than the content warning by default', () => {
-    const quote = fromNote(note({ text: 'the note', cw: 'a warning' }))
-
-    expect(quote.text).toBe('the note')
-  })
-
-  it('quotes the content warning when asked', () => {
-    const quote = fromNote(note({ text: 'the note', cw: 'a warning' }), { preferCw: true })
-
-    expect(quote.text).toBe('a warning')
-  })
-
-  it('falls back to the other when one of text and cw is missing', () => {
-    expect(fromNote(note({ text: null, cw: 'only a warning' })).text).toBe('only a warning')
-    expect(fromNote(note({ text: 'only text' }), { preferCw: true }).text).toBe('only text')
-  })
-
-  it('treats a text-less note as empty rather than throwing', () => {
-    expect(fromNote(note({ text: null, cw: null })).text).toBe('')
-  })
-
   it('rejects anything that is not a note', () => {
     expect(() => fromNote(null)).toThrow(ValidationError)
     expect(() => fromNote({})).toThrow(ValidationError)

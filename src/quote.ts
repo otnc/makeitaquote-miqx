@@ -1,3 +1,9 @@
+import {
+  assertBoolean,
+  assertString,
+  normalizeAvatarSource,
+  normalizeString,
+} from '@makeitaquote/utils/validation'
 import { ValidationError } from './errors'
 import type { AvatarSource, QuoteData, QuoteInput } from './types'
 
@@ -21,31 +27,12 @@ export function emptyQuote(): QuoteData {
   }
 }
 
-function assertString(value: unknown, field: string): asserts value is string {
-  if (typeof value !== 'string') {
-    throw new ValidationError(`${field} must be a string, received ${typeof value}`, { field })
-  }
-}
-
-function assertLength(value: string, max: number, field: string) {
-  if (value.length > max) {
-    throw new ValidationError(
-      `${field} must be at most ${max} characters, received ${value.length}`,
-      { field },
-    )
-  }
-}
-
 export function normalizeText(text: unknown): string {
-  assertString(text, 'text')
-  assertLength(text, MAX_TEXT_LENGTH, 'text')
-  return text
+  return normalizeString(text, 'text', MAX_TEXT_LENGTH)
 }
 
 export function normalizeName(name: unknown): string {
-  assertString(name, 'name')
-  assertLength(name, MAX_NAME_LENGTH, 'name')
-  return name
+  return normalizeString(name, 'name', MAX_NAME_LENGTH)
 }
 
 /** `id` must be a unique, alphanumeric-only identifier for the message — no spaces or symbols. */
@@ -60,40 +47,25 @@ export function normalizeId(id: unknown): string {
 }
 
 export function normalizeMid(mid: unknown): string {
-  assertString(mid, 'mid')
-  assertLength(mid, MAX_NAME_LENGTH, 'mid')
-  return mid
+  return normalizeString(mid, 'mid', MAX_NAME_LENGTH)
 }
 
 export function normalizeParam(param: unknown): string | null {
   if (param === null || param === undefined) return null
-  assertString(param, 'param')
-  assertLength(param, MAX_PARAM_LENGTH, 'param')
-  return param
+  return normalizeString(param, 'param', MAX_PARAM_LENGTH)
 }
 
 export function normalizeIcon(icon: unknown): AvatarSource | null {
-  if (icon === null || icon === undefined) return null
-  if (typeof icon === 'string') return icon
-  if (icon instanceof URL) return icon
-  if (icon instanceof Uint8Array) return icon
-  if (icon instanceof Blob) return icon
-  throw new ValidationError('icon must be a string, URL, Buffer, Uint8Array or Blob', {
-    field: 'icon',
-  })
+  return normalizeAvatarSource(icon, 'icon', { allowBlob: true })
 }
 
 export function normalizeHideLogo(hideLogo: unknown): boolean {
-  if (typeof hideLogo !== 'boolean') {
-    throw new ValidationError('hideLogo must be a boolean', { field: 'hideLogo' })
-  }
+  assertBoolean(hideLogo, 'hideLogo')
   return hideLogo
 }
 
 export function normalizeUpload(upload: unknown): boolean {
-  if (typeof upload !== 'boolean') {
-    throw new ValidationError('upload must be a boolean', { field: 'upload' })
-  }
+  assertBoolean(upload, 'upload')
   return upload
 }
 
