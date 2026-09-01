@@ -1,11 +1,8 @@
 # @makeitaquote/miqx
 
-> Generate "Make it a Quote" images through the MiqX API.
+Generate "Make it a Quote" images through the MiqX API.
 
-[![npm](https://img.shields.io/npm/v/@makeitaquote/miqx)](https://www.npmjs.com/package/@makeitaquote/miqx)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/otnc/makeitaquote-miqx/ci.yml?branch=main)](https://github.com/otnc/makeitaquote-miqx/actions)
-[![GitHub](https://img.shields.io/github/license/otnc/makeitaquote-miqx)](https://github.com/otnc/makeitaquote-miqx/blob/main/LICENSE)
-[![Node](https://img.shields.io/node/v/@makeitaquote/miqx)](https://www.npmjs.com/package/@makeitaquote/miqx)
+[![npm](https://img.shields.io/npm/v/@makeitaquote/miqx)](https://www.npmjs.com/package/@makeitaquote/miqx) [![CI](https://img.shields.io/github/actions/workflow/status/otnc/makeitaquote-miqx/ci.yml?branch=main&label=ci)](https://github.com/otnc/makeitaquote-miqx/actions) [![License](https://img.shields.io/github/license/otnc/makeitaquote-miqx)](LICENSE) [![Node](https://img.shields.io/node/v/@makeitaquote/miqx)](https://www.npmjs.com/package/@makeitaquote/miqx)
 
 Calls the [MiqX API](https://miqx.jp/docs) instead of rendering locally — no native binaries, no fonts, works anywhere Node.js runs.
 
@@ -13,13 +10,17 @@ Calls the [MiqX API](https://miqx.jp/docs) instead of rendering locally — no n
 >   
 > The MiqX API (`https://api.miqx.jp`) is not operated by this package's developer. Please don't open issues here about it being down, and get an API key from the [dashboard](https://miqx.jp/dashboard) before using this package.
 
-## Install
+> [!Important]
+>   
+> This package only calls the MiqX API — it does not render images locally. If you want local rendering instead (no network dependency, more control over the theme), use `makeitaquote`: https://github.com/otnc/makeitaquote
+>
+> ```sh
+> npm install makeitaquote
+> ```
 
 ```sh
 npm install @makeitaquote/miqx
 ```
-
-## Usage
 
 ```ts
 import { writeFile } from 'node:fs/promises'
@@ -255,6 +256,8 @@ MiQError
 ```
 
 `.errorCode` mirrors the API's own `error_code` (e.g. `VALIDATION_ERROR`, `GENERATION_ERROR`) when the response included one — see the [error codes documented at miqx.jp/docs](https://miqx.jp/docs).
+
+`MiQError`/`ValidationError` come from [`@makeitaquote/utils`](https://www.npmjs.com/package/@makeitaquote/utils), shared with `makeitaquote` and `@makeitaquote/voids` — `instanceof MiQError` catches all three packages' errors once the version you have of each has migrated to it. Only `MiQXApiError` is specific to this package.
 
 ```ts
 import { MiQXApiError, ValidationError } from '@makeitaquote/miqx'
