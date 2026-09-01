@@ -10,7 +10,7 @@
 Calls the [MiqX API](https://miqx.jp/docs) instead of rendering locally — no native binaries, no fonts, works anywhere Node.js runs.
 
 > [!Note]
->
+>   
 > The MiqX API (`https://api.miqx.jp`) is not operated by this package's developer. Please don't open issues here about it being down, and get an API key from the [dashboard](https://miqx.jp/dashboard) before using this package.
 
 ## Install
