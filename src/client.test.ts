@@ -180,12 +180,32 @@ describe('input', () => {
     expect(data.mid).toBe('1')
   })
 
-  it('keeps param/hideLogo/upload across setFromMessage', () => {
+  it('builds from a tweet', () => {
+    const data = new MiQX({ apiKey: 'k' })
+      .setFromTweet({
+        id: '20',
+        text: 'just setting up my twttr',
+        author: { id: '12', username: 'jack', name: 'jack', avatarUrl: 'https://cdn.test/j.png' },
+      })
+      .getData()
+
+    expect(data.text).toBe('just setting up my twttr')
+    expect(data.name).toBe('jack')
+    expect(data.id).toBe('20')
+    expect(data.mid).toBe('12')
+    expect(data.icon).toBe('https://cdn.test/j.png')
+  })
+
+  it('keeps param/hideLogo/upload across setFromMessage/setFromTweet', () => {
     const data = new MiQX({ apiKey: 'k' })
       .setParam('p')
       .setHideLogo()
       .setUpload()
-      .setFromMessage(v14Message())
+      .setFromTweet({
+        id: '20',
+        text: 'hi',
+        author: { id: '12', username: 'jack' },
+      })
       .getData()
 
     expect(data).toMatchObject({ param: 'p', hideLogo: true, upload: true })

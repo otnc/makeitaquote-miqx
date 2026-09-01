@@ -15,6 +15,7 @@ import {
   normalizeUpload,
 } from './quote'
 import { fromMessage } from './source'
+import { fromTweet } from './tweet'
 import type {
   AvatarSource,
   MessageLike,
@@ -23,6 +24,7 @@ import type {
   MiQXResult,
   QuoteData,
   QuoteInput,
+  TweetLike,
 } from './types'
 import { errorMessage } from './util/errorMessage'
 import { filenameFor, resolveIcon } from './util/icon'
@@ -118,6 +120,19 @@ export class MiQX {
   setFromMessage(message: MessageLike, options?: MessageSourceOptions): this {
     const { param, hideLogo, upload } = this.#data
     this.#data = { ...fromMessage(message, options), param, hideLogo, upload }
+    return this
+  }
+
+  /**
+   * Reads a tweet/post the way `setFromMessage()` reads a Discord message.
+   *
+   * `TweetLike` has no adapter this package fetches through directly —
+   * `fromTwitterApiV2Tweet()`/`fromFxTwitterStatus()` turn a real API
+   * response into one first.
+   */
+  setFromTweet(tweet: TweetLike): this {
+    const { param, hideLogo, upload } = this.#data
+    this.#data = { ...fromTweet(tweet), param, hideLogo, upload }
     return this
   }
 

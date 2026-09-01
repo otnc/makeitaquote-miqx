@@ -127,6 +127,32 @@ export interface MessageSourceOptions {
   resolveMentions?: boolean | MentionOptions
 }
 
+/**
+ * The shape of a tweet/post that `setFromTweet()` understands.
+ *
+ * Structural, like `MessageLike` — but unlike it, there is no dedicated
+ * adapter this package fetches through directly: the official API splits a
+ * tweet from its author (`author_id`, resolved through a separate
+ * `includes.users` array), and FxTwitter spells the fields differently
+ * (`screen_name`, `avatar_url`). `fromTwitterApiV2Tweet()` and
+ * `fromFxTwitterStatus()`, from `./tweetAdapters`, adapt each into this shape.
+ *
+ * Unlike the local renderer's own `TweetLike`, `id` and `author.id` are
+ * required — they become `id` and `mid`, which the MiqX API requires.
+ */
+export interface TweetLike {
+  id: string
+  text: string
+  author: {
+    id: string
+    /** Handle, without the leading `@`. */
+    username: string
+    /** Display name. Falls back to the handle when absent. */
+    name?: string | null
+    avatarUrl?: string | null
+  }
+}
+
 export interface MiQXOptions {
   /** Your MiqX API key — issued from the dashboard at https://miqx.jp/dashboard */
   apiKey: string
