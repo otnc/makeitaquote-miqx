@@ -1,5 +1,5 @@
+import { stripMfm } from '@makeitaquote/utils/mfm'
 import { ValidationError } from './errors'
-import { stripMfm } from './mfm'
 import { emptyQuote } from './quote'
 import type { NoteLike, NoteSourceOptions, QuoteData } from './types'
 

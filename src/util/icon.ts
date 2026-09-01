@@ -1,7 +1,7 @@
+import { errorMessage } from '@makeitaquote/utils/errors'
+import { createClient, HTTPError, TimeoutError } from '@makeitaquote/utils/http'
 import { ValidationError } from '../errors'
-import { createClient, HTTPError, TimeoutError } from '../http'
 import type { AvatarSource } from '../types'
-import { errorMessage } from './errorMessage'
 
 /**
  * Turns any accepted icon source into a `Blob` the multipart body can carry.

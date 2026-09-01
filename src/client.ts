@@ -1,6 +1,7 @@
+import { errorMessage } from '@makeitaquote/utils/errors'
+import { createClient, HTTPError, type HttpClient, TimeoutError } from '@makeitaquote/utils/http'
 import { type ApiVersion, DEFAULT_API_VERSION, DEFAULT_BASE_URL } from './endpoints'
 import { MiQXApiError, ValidationError } from './errors'
-import { createClient, HTTPError, type HttpClient, TimeoutError } from './http'
 import { fromNote } from './note'
 import {
   applyInput,
@@ -29,7 +30,6 @@ import type {
   QuoteInput,
   TweetLike,
 } from './types'
-import { errorMessage } from './util/errorMessage'
 import * as v1 from './v1'
 
 /**

@@ -1,32 +1,8 @@
+import { MiQError } from '@makeitaquote/utils/errors'
 import type { MiQXApiErrorOptions } from './types'
 
-export interface MiQErrorOptions {
-  cause?: unknown
-}
-
-/** Base class for everything this package throws. */
-export class MiQError extends Error {
-  constructor(message: string, options?: MiQErrorOptions) {
-    super(message, options)
-    this.name = 'MiQError'
-  }
-}
-
-export interface ValidationErrorOptions extends MiQErrorOptions {
-  /** Which input field was rejected, e.g. `'text'`. */
-  field?: string
-}
-
-/** An input failed a type, format or length check. */
-export class ValidationError extends MiQError {
-  readonly field: string | undefined
-
-  constructor(message: string, options?: ValidationErrorOptions) {
-    super(message, options)
-    this.name = 'ValidationError'
-    this.field = options?.field
-  }
-}
+export type { MiQErrorOptions, ValidationErrorOptions } from '@makeitaquote/utils/errors'
+export { MiQError, ValidationError } from '@makeitaquote/utils/errors'
 
 /** The MiqX API refused or failed a request. */
 export class MiQXApiError extends MiQError {

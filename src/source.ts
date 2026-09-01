@@ -1,50 +1,13 @@
-import { stripDiscordMarkdown } from './discordMarkdown'
+import {
+  avatarURL,
+  globalName,
+  guildName,
+  resolveMentions,
+  stripDiscordMarkdown,
+} from '@makeitaquote/utils/discord'
 import { ValidationError } from './errors'
-import { resolveMentions } from './mentions'
 import { emptyQuote } from './quote'
 import type { MessageLike, MessageSourceOptions, QuoteData } from './types'
-
-/**
- * Ask discord.js for a PNG icon at a sane size.
- *
- * The default `displayAvatarURL()` can hand back an animated WebP, and pulling
- * a 4096px source to draw it small is pure waste. Some older or hand-rolled
- * message objects take no arguments at all, so fall back to a bare call.
- */
-function avatarURL(holder: { displayAvatarURL?: (options?: unknown) => string }): string | null {
-  if (typeof holder.displayAvatarURL !== 'function') return null
-  try {
-    const url = holder.displayAvatarURL({ extension: 'png', size: 512 })
-    if (typeof url === 'string' && url.length > 0) return url
-  } catch {
-    // Falls through to the no-argument form below.
-  }
-  try {
-    const url = holder.displayAvatarURL()
-    return typeof url === 'string' && url.length > 0 ? url : null
-  } catch {
-    return null
-  }
-}
-
-/** The per-server nickname, if this message has one. */
-function guildName(message: MessageLike): string | null {
-  const member = message.member
-  if (!member) return null
-  if (typeof member.nickname === 'string' && member.nickname) return member.nickname
-  // discord.js exposes displayName as "nickname, or the global name"; it is
-  // only a guild name when a nickname is actually set, so it is checked second.
-  if (typeof member.displayName === 'string' && member.displayName) return member.displayName
-  return null
-}
-
-/** The account-wide display name, ignoring any server nickname. */
-function globalName(message: MessageLike): string | null {
-  const { author } = message
-  if (typeof author.globalName === 'string' && author.globalName) return author.globalName
-  if (typeof author.global_name === 'string' && author.global_name) return author.global_name
-  return null
-}
 
 function isMessageLike(value: unknown): value is MessageLike {
   if (value === null || typeof value !== 'object') return false
