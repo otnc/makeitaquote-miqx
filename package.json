@@ -63,7 +63,10 @@
     "lint:fix": "biome lint --write",
     "check": "biome check --write",
     "ci": "biome ci",
-    "prepublishOnly": "npm run build"
+    "check:build": "node scripts/check-build.js",
+    "prepublishOnly": "npm run build",
+    "checkupdates": "ncu -u -t minor",
+    "migrate": "biome migrate --write"
   },
   "dependencies": {
     "discomd": "^1.2.0",
@@ -76,6 +79,7 @@
     "@types/markdown-it": "^14.2.0",
     "@types/node": "^22.20.1",
     "@vitest/coverage-v8": "^4.1.11",
+    "npm-check-updates": "^23.1.0",
     "tsdown": "^0.22.14",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
