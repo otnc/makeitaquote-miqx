@@ -83,6 +83,16 @@ const miqx = new MiQX({ apiKey: process.env.MIQX_API_KEY! })
 
 `hideLogo` (removing the MiqX watermark) and `upload` (getting a hosted URL back) are gated to Basic+ and Starter+ plans respectively — the API ignores or rejects them otherwise.
 
+### API versions
+
+MiqX only has `v1` today, and `MiQX` defaults to it. The option is there so a future `v2` doesn't force a breaking change onto every caller — once one ships, opt in with:
+
+```ts
+new MiQX({ apiKey, apiVersion: 'v2' })
+```
+
+Everything about `v1` — its request and response shape — lives in one file, `src/v1.ts`; `v2` would get its own alongside it, with `MiQX` dispatching between them by `apiVersion`. Nothing about the fluent builder itself (`setText()`, `setFromMessage()`, …) changes across versions.
+
 ---
 
 ## Discord bots

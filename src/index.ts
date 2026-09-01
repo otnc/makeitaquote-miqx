@@ -1,6 +1,7 @@
 export { MiQX } from './client'
 export { stripDiscordMarkdown } from './discordMarkdown'
-export { DEFAULT_BASE_URL, MAKE_PATH } from './endpoints'
+export type { ApiVersion } from './endpoints'
+export { DEFAULT_API_VERSION, DEFAULT_BASE_URL } from './endpoints'
 export { MiQError, MiQXApiError, ValidationError } from './errors'
 export { stripMarkdown } from './markdown'
 export { stripMfm } from './mfm'
@@ -22,3 +23,4 @@ export type {
   QuoteInput,
   TweetLike,
 } from './types'
+export { PATH as V1_MAKE_PATH } from './v1'

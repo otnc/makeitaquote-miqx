@@ -124,6 +124,19 @@ describe('generate', () => {
     expect(calls[0]?.url).toBe('https://mirror.test/v1/make')
   })
 
+  it('defaults to the v1 endpoint, and honours an explicit apiVersion', async () => {
+    stubFetch(() => successResponse())
+
+    await new MiQX({ apiKey: 'k', apiVersion: 'v1', retry: 0 })
+      .setText('hi')
+      .setName('n')
+      .setId('id1')
+      .setMid('m1')
+      .generate()
+
+    expect(calls[0]?.url).toBe('https://api.miqx.jp/v1/make')
+  })
+
   it('attaches the icon as a file part when set from bytes', async () => {
     stubFetch(() => successResponse())
 
@@ -245,6 +258,21 @@ describe('input', () => {
 
     expect(original.getData().text).toBe('first')
     expect(copy.getData().text).toBe('second')
+  })
+
+  it('clone carries the apiVersion over', async () => {
+    stubFetch(() => successResponse())
+
+    const copy = new MiQX({ apiKey: 'k', apiVersion: 'v1', retry: 0 })
+      .setText('hi')
+      .setName('n')
+      .setId('id1')
+      .setMid('m1')
+      .clone()
+
+    await copy.generate()
+
+    expect(calls[0]?.url).toBe('https://api.miqx.jp/v1/make')
   })
 })
 

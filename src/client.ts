@@ -1,4 +1,4 @@
-import { DEFAULT_BASE_URL, MAKE_PATH } from './endpoints'
+import { type ApiVersion, DEFAULT_API_VERSION, DEFAULT_BASE_URL } from './endpoints'
 import { MiQXApiError, ValidationError } from './errors'
 import { createClient, HTTPError, type HttpClient, TimeoutError } from './http'
 import { fromNote } from './note'
@@ -30,7 +30,7 @@ import type {
   TweetLike,
 } from './types'
 import { errorMessage } from './util/errorMessage'
-import { filenameFor, resolveIcon } from './util/icon'
+import * as v1 from './v1'
 
 /**
  * Builds a "Make it a Quote" image through the MiqX API.
@@ -53,6 +53,7 @@ export class MiQX {
   #data: QuoteData = emptyQuote()
   #http: HttpClient
   #apiKey: string
+  #apiVersion: ApiVersion
   #baseUrl: string
   #signal: AbortSignal | undefined
 
@@ -62,6 +63,7 @@ export class MiQX {
     }
 
     this.#apiKey = options.apiKey
+    this.#apiVersion = options.apiVersion ?? DEFAULT_API_VERSION
     this.#baseUrl = (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '')
     this.#signal = options.signal
     this.#http = createClient({
@@ -161,7 +163,11 @@ export class MiQX {
   }
 
   clone(): MiQX {
-    const copy = new MiQX({ apiKey: this.#apiKey, baseUrl: this.#baseUrl })
+    const copy = new MiQX({
+      apiKey: this.#apiKey,
+      apiVersion: this.#apiVersion,
+      baseUrl: this.#baseUrl,
+    })
     copy.#data = { ...this.#data }
     copy.#http = this.#http
     copy.#signal = this.#signal
@@ -189,7 +195,7 @@ export class MiQX {
     const result = await this.#send(true)
     if (!result.url) {
       throw new MiQXApiError('The API response did not contain a url', {
-        endpoint: MAKE_PATH,
+        endpoint: this.#path(),
         body: result,
       })
     }
@@ -199,78 +205,55 @@ export class MiQX {
   async #send(upload: boolean): Promise<MiQXResult> {
     assertRenderable(this.#data)
 
+    const path = this.#path()
     const form = await this.#buildForm(upload)
 
     let response: Response
     try {
-      response = await this.#http.post(`${this.#baseUrl}${MAKE_PATH}`, {
+      response = await this.#http.post(`${this.#baseUrl}${path}`, {
         json: form,
         ...(this.#signal ? { signal: this.#signal } : {}),
       })
     } catch (cause) {
-      throw toApiError(cause, 'Failed to generate quote')
+      throw toApiError(cause, path, 'Failed to generate quote')
     }
 
     let parsed: unknown
     try {
       parsed = await response.json()
     } catch (cause) {
-      throw new MiQXApiError('The API did not return JSON', { endpoint: MAKE_PATH, cause })
+      throw new MiQXApiError('The API did not return JSON', { endpoint: path, cause })
     }
 
-    return parseResult(parsed)
+    return this.#parseResult(parsed)
   }
 
-  async #buildForm(upload: boolean): Promise<FormData> {
-    const { text, name, id, mid, icon, param, hideLogo } = this.#data
-
-    const form = new FormData()
-    form.set('text', text)
-    form.set('name', name)
-    form.set('id', id)
-    form.set('mid', mid)
-    if (param !== null) form.set('param', param)
-    if (hideLogo) form.set('hideLogo', 'true')
-    if (upload) form.set('upload', 'true')
-    if (icon !== null) {
-      const blob = await resolveIcon(icon, this.#signal)
-      form.set('img', blob, filenameFor(blob))
+  /** The endpoint path for the request currently in flight — version-specific. */
+  #path(): string {
+    switch (this.#apiVersion) {
+      case 'v1':
+        return v1.PATH
+      default:
+        return assertNeverVersion(this.#apiVersion)
     }
-    return form
-  }
-}
-
-function parseResult(parsed: unknown): MiQXResult {
-  const body = parsed as {
-    status?: unknown
-    message?: unknown
-    error_code?: unknown
-    data?: { image?: unknown; url?: unknown }
-  } | null
-
-  if (body?.status !== 'success') {
-    throw new MiQXApiError(
-      typeof body?.message === 'string' ? body.message : 'The API reported a failure',
-      {
-        endpoint: MAKE_PATH,
-        body: parsed,
-        errorCode: typeof body?.error_code === 'string' ? body.error_code : undefined,
-      },
-    )
   }
 
-  const image = body.data?.image
-  if (typeof image !== 'string' || image.length === 0) {
-    throw new MiQXApiError('The API response did not contain image data', {
-      endpoint: MAKE_PATH,
-      body: parsed,
-    })
+  #buildForm(upload: boolean): Promise<FormData> {
+    switch (this.#apiVersion) {
+      case 'v1':
+        return v1.buildForm(this.#data, upload, this.#signal)
+      default:
+        return assertNeverVersion(this.#apiVersion)
+    }
   }
 
-  const url = body.data?.url
-  return {
-    image: Buffer.from(image, 'base64'),
-    url: typeof url === 'string' ? url : null,
+  #parseResult(parsed: unknown): MiQXResult {
+    switch (this.#apiVersion) {
+      case 'v1':
+        return v1.parseResult(parsed)
+      default:
+        return assertNeverVersion(this.#apiVersion)
+    }
   }
 }
 
@@ -278,11 +261,11 @@ function parseResult(parsed: unknown): MiQXResult {
  * Turns whatever the HTTP layer threw into a `MiQXApiError`, keeping the
  * response body — and its `error_code` — when there is one.
  */
-function toApiError(cause: unknown, prefix: string): MiQXApiError {
+function toApiError(cause: unknown, endpoint: string, prefix: string): MiQXApiError {
   if (cause instanceof HTTPError) {
     const parsedBody = safeJsonParse(cause.body)
     return new MiQXApiError(`${prefix}: HTTP ${cause.response.status}`, {
-      endpoint: MAKE_PATH,
+      endpoint,
       status: cause.response.status,
       body: parsedBody ?? cause.body,
       errorCode: typeof parsedBody?.error_code === 'string' ? parsedBody.error_code : undefined,
@@ -291,10 +274,19 @@ function toApiError(cause: unknown, prefix: string): MiQXApiError {
   }
 
   if (cause instanceof TimeoutError) {
-    return new MiQXApiError(`${prefix}: request timed out`, { endpoint: MAKE_PATH, cause })
+    return new MiQXApiError(`${prefix}: request timed out`, { endpoint, cause })
   }
 
-  return new MiQXApiError(`${prefix}: ${errorMessage(cause)}`, { endpoint: MAKE_PATH, cause })
+  return new MiQXApiError(`${prefix}: ${errorMessage(cause)}`, { endpoint, cause })
+}
+
+/**
+ * Exhaustiveness check for `ApiVersion`. Extending the union without adding a
+ * matching `case` above fails to compile here — `version` stops being `never`
+ * the moment a new member is added and not yet handled.
+ */
+function assertNeverVersion(version: never): never {
+  throw new Error(`Unhandled API version: ${version as string}`)
 }
 
 function safeJsonParse(text: string): { error_code?: unknown; message?: unknown } | null {

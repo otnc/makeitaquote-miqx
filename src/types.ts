@@ -1,3 +1,4 @@
+import type { ApiVersion } from './endpoints'
 import type { MiQErrorOptions } from './errors'
 
 /** Anything that can stand in for the icon image. */
@@ -201,6 +202,8 @@ export interface TweetLike {
 export interface MiQXOptions {
   /** Your MiqX API key — issued from the dashboard at https://miqx.jp/dashboard */
   apiKey: string
+  /** Which API version to talk to. Default `'v1'` — the only one that exists today. */
+  apiVersion?: ApiVersion
   baseUrl?: string
   /** Request timeout in ms, default 15000. */
   timeout?: number
