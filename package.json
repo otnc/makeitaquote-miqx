@@ -1,18 +1,31 @@
 {
-  "name": "<package-name>",
+  "name": "@makeitaquote/miqx",
   "version": "0.0.0",
-  "description": "<package-description>",
-  "keywords": [],
-  "homepage": "<package-git>#readme",
+  "description": "Generate \"Make it a Quote\" images through the Voids API.",
+  "keywords": [
+    "img",
+    "image",
+    "gen",
+    "generate",
+    "miq",
+    "makeitaquote",
+    "Make it a Quote",
+    "quote",
+    "discord",
+    "api",
+    "miqx",
+    "miq-x"
+  ],
+  "homepage": "https://github.com/otnc/makeitaquote-miqx#readme",
   "bugs": {
-    "url": "<package-git>/issues"
+    "url": "https://github.com/otnc/makeitaquote-miqx/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+<package-git>.git"
+    "url": "git+https://github.com/otnc/makeitaquote-miqx.git"
   },
-  "license": "<package-license>",
-  "author": "<package-author>",
+  "license": "MIT",
+  "author": "otoneko.",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
