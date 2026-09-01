@@ -67,6 +67,7 @@
   },
   "dependencies": {
     "discomd": "^1.2.0",
+    "mfm-js": "^0.26.0",
     "ofetch": "^1.5.1"
   },
   "devDependencies": {

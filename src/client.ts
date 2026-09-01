@@ -1,6 +1,7 @@
 import { DEFAULT_BASE_URL, MAKE_PATH } from './endpoints'
 import { MiQXApiError, ValidationError } from './errors'
 import { createClient, HTTPError, type HttpClient, TimeoutError } from './http'
+import { fromNote } from './note'
 import {
   applyInput,
   assertRenderable,
@@ -22,6 +23,8 @@ import type {
   MessageSourceOptions,
   MiQXOptions,
   MiQXResult,
+  NoteLike,
+  NoteSourceOptions,
   QuoteData,
   QuoteInput,
   TweetLike,
@@ -120,6 +123,18 @@ export class MiQX {
   setFromMessage(message: MessageLike, options?: MessageSourceOptions): this {
     const { param, hideLogo, upload } = this.#data
     this.#data = { ...fromMessage(message, options), param, hideLogo, upload }
+    return this
+  }
+
+  /**
+   * Reads a Misskey note the way `setFromMessage()` reads a Discord message.
+   *
+   * Takes what the API returns for a note, unchanged. MFM is stripped by
+   * default — see `NoteSourceOptions`.
+   */
+  setFromNote(note: NoteLike, options?: NoteSourceOptions): this {
+    const { param, hideLogo, upload } = this.#data
+    this.#data = { ...fromNote(note, options), param, hideLogo, upload }
     return this
   }
 

@@ -196,7 +196,22 @@ describe('input', () => {
     expect(data.icon).toBe('https://cdn.test/j.png')
   })
 
-  it('keeps param/hideLogo/upload across setFromMessage/setFromTweet', () => {
+  it('builds from a Misskey note', () => {
+    const data = new MiQX({ apiKey: 'k' })
+      .setFromNote({
+        id: 'x',
+        text: '$[jelly おはよう]',
+        user: { id: 'u', username: 'otoneko', name: '音猫｡', host: null, avatarUrl: null },
+      })
+      .getData()
+
+    expect(data.text).toBe('おはよう')
+    expect(data.name).toBe('音猫｡')
+    expect(data.id).toBe('x')
+    expect(data.mid).toBe('u')
+  })
+
+  it('keeps param/hideLogo/upload across setFromMessage/setFromTweet/setFromNote', () => {
     const data = new MiQX({ apiKey: 'k' })
       .setParam('p')
       .setHideLogo()

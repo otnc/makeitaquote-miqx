@@ -128,6 +128,51 @@ export interface MessageSourceOptions {
 }
 
 /**
+ * The shape of a Misskey note that `setFromNote()` understands.
+ *
+ * Structural, like `MessageLike`: this is what the API actually returns for
+ * a note, so a response passed straight through fits without adaptation.
+ * Unlike the local renderer's own `NoteLike`, `id` and `user.id` are
+ * required — they become `id` and `mid`, which the MiqX API requires.
+ */
+export interface NoteLike {
+  id: string
+  text?: string | null
+  /** Content warning. Only read when `setFromNote` is told to prefer it. */
+  cw?: string | null
+  user: {
+    id: string
+    username: string
+    /** Display name. Null when the account never set one. */
+    name?: string | null
+    /** Instance the author is on. Null or absent when they are local. */
+    host?: string | null
+    avatarUrl?: string | null
+  }
+}
+
+export interface NoteSourceOptions {
+  /**
+   * Runs the note through `stripMfm()` before quoting it. Default **true**,
+   * unlike `stripDiscordMarkdown` for Discord.
+   *
+   * The two differ because the markup does. `**bold**` still reads as its
+   * own text with the asterisks left in; `$[jelly ぷりん]` does not — the
+   * function name and brackets are scaffolding that was never meant to be
+   * read, so leaving them in a picture is just noise.
+   */
+  stripMfm?: boolean
+  /**
+   * Quote the content warning instead of the text it hides. Default false.
+   *
+   * A CW is what a reader saw *before* choosing to open the note, so it is
+   * occasionally the honest thing to quote — but the note itself is the
+   * usual intent.
+   */
+  preferCw?: boolean
+}
+
+/**
  * The shape of a tweet/post that `setFromTweet()` understands.
  *
  * Structural, like `MessageLike` — but unlike it, there is no dedicated
