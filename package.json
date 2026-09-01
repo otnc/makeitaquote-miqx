@@ -50,7 +50,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=18"
   },
   "scripts": {
     "setup": "node scripts/setup.js",
