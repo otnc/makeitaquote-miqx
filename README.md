@@ -17,6 +17,12 @@ Calls the [MiqX API](https://miqx.jp/docs) instead of rendering locally — no n
 > ```sh
 > npm install makeitaquote
 > ```
+>
+> Prefer a different upstream API instead? [`@makeitaquote/voids`](https://github.com/otnc/makeitaquote-voids) does the same thing this package does, through the Voids API:
+>
+> ```sh
+> npm install @makeitaquote/voids
+> ```
 
 ```sh
 npm install @makeitaquote/miqx
